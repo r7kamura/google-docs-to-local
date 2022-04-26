@@ -14,7 +14,7 @@ async function main() {
 
   const files = await listFiles({ drive, folderId });
 
-  const directoryPath = "output";
+  const directoryPath = core.getInput("output_directory_path");
 
   await createDirectory({ directoryPath });
 
@@ -37,7 +37,7 @@ async function main() {
 async function createDirectory({ directoryPath }) {
   await fsPromises.stat(directoryPath).catch((err) => {
     if (err.code === "ENOENT") {
-      fsPromises.mkdir(directoryPath);
+      fsPromises.mkdir(directoryPath, { recursive: true });
     }
   });
 }
