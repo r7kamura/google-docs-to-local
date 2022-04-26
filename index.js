@@ -17,7 +17,7 @@ async function main({ googleDriveFolderId, outputDirectoryPath }) {
 
   await createDirectory({ outputDirectoryPath });
 
-  await writeExportedFiles({ exportFiles });
+  await writeExportedFiles({ exportedFiles });
 }
 
 async function createDirectory({ outputDirectoryPath }) {
