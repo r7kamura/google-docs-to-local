@@ -64,7 +64,7 @@ async function writeExportedFiles({ exportedFiles, outputDirectoryPath }) {
   exportedFiles.forEach(async (exportedFile) => {
     await fsPromises.writeFile(
       `${outputDirectoryPath}/${exportedFile.id}.json`,
-      JSON.stringify(exportedFile)
+      JSON.stringify(exportedFile, null, 2)
     );
   });
 }
