@@ -10,14 +10,14 @@ async function main({ googleDriveFolderId, outputDirectoryPath }) {
     version: "v3",
   });
 
-  const exportedFiles = exportFiles({
+  const exportedFiles = await exportFiles({
     drive,
     files: await listFiles({ drive, googleDriveFolderId }),
   });
 
   await createDirectory({ outputDirectoryPath });
 
-  await writeExportedFiles({ exportedFiles });
+  await writeExportedFiles({ exportedFiles, outputDirectoryPath });
 }
 
 async function createDirectory({ outputDirectoryPath }) {
@@ -37,15 +37,17 @@ async function exportFile({ drive, fileId }) {
 }
 
 async function exportFiles({ drive, files }) {
-  return files.map(async (file) => {
-    return {
-      ...file,
-      html: await exportFile({
-        drive,
-        fileId: file.id,
-      }),
-    };
-  });
+  return Promise.all(
+    files.map(async (file) => {
+      return {
+        ...file,
+        html: await exportFile({
+          drive,
+          fileId: file.id,
+        }),
+      };
+    })
+  );
 }
 
 async function listFiles({ drive, googleDriveFolderId }) {
@@ -58,7 +60,7 @@ async function listFiles({ drive, googleDriveFolderId }) {
   return response.data.files;
 }
 
-async function writeExportedFiles({ exportedFiles }) {
+async function writeExportedFiles({ exportedFiles, outputDirectoryPath }) {
   exportedFiles.forEach(async (exportedFile) => {
     await fsPromises.writeFile(
       `${outputDirectoryPath}/${exportedFile.id}.json`,
