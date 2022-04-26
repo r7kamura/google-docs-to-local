@@ -60,7 +60,4 @@ async function listFiles({ drive, folderId }) {
   return response.data.files;
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+main().catch(core.setFailed);
