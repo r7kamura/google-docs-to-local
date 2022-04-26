@@ -58,7 +58,7 @@ async function listFiles({ drive, googleDriveFolderId }) {
   return response.data.files;
 }
 
-async function writeExportedFiles({ exportFiles }) {
+async function writeExportedFiles({ exportedFiles }) {
   exportedFiles.forEach(async (exportedFile) => {
     await fsPromises.writeFile(
       `${outputDirectoryPath}/${exportedFile.id}.json`,
