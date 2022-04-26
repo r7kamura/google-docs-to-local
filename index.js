@@ -2,7 +2,7 @@ const fsPromises = require("fs/promises");
 const { google } = require("googleapis");
 const core = require("@actions/core");
 
-async function main() {
+async function main({ googleDriveFolderId, outputDirectoryPath }) {
   const drive = google.drive({
     auth: new google.auth.GoogleAuth({
       scopes: ["https://www.googleapis.com/auth/drive.readonly"],
@@ -10,34 +10,20 @@ async function main() {
     version: "v3",
   });
 
-  const folderId = core.getInput("google_drive_folder_id");
-
-  const files = await listFiles({ drive, folderId });
-
-  const directoryPath = core.getInput("output_directory_path");
-
-  await createDirectory({ directoryPath });
-
-  files.forEach(async (file) => {
-    const html = await exportFile({
-      drive,
-      fileId: file.id,
-    });
-
-    await fsPromises.writeFile(
-      `${directoryPath}/${file.id}.json`,
-      JSON.stringify({
-        ...file,
-        html,
-      })
-    );
+  const exportedFiles = exportFiles({
+    drive,
+    files: await listFiles({ drive, googleDriveFolderId }),
   });
+
+  await createDirectory({ outputDirectoryPath });
+
+  await writeExportedFiles({ exportFiles });
 }
 
-async function createDirectory({ directoryPath }) {
-  await fsPromises.stat(directoryPath).catch((err) => {
+async function createDirectory({ outputDirectoryPath }) {
+  await fsPromises.stat(outputDirectoryPath).catch((err) => {
     if (err.code === "ENOENT") {
-      fsPromises.mkdir(directoryPath, { recursive: true });
+      fsPromises.mkdir(outputDirectoryPath, { recursive: true });
     }
   });
 }
@@ -50,14 +36,38 @@ async function exportFile({ drive, fileId }) {
   return response.data;
 }
 
-async function listFiles({ drive, folderId }) {
+async function exportFiles({ drive, files }) {
+  return files.map(async (file) => {
+    return {
+      ...file,
+      html: await exportFile({
+        drive,
+        fileId: file.id,
+      }),
+    };
+  });
+}
+
+async function listFiles({ drive, googleDriveFolderId }) {
   const response = await drive.files.list({
     fields: "nextPageToken, files(id, name, createdTime, modifiedTime)",
     orderBy: "modifiedTime desc",
     pageSize: 1000,
-    q: `'${folderId}' in parents and mimeType = 'application/vnd.google-apps.document'`,
+    q: `'${googleDriveFolderId}' in parents and mimeType = 'application/vnd.google-apps.document'`,
   });
   return response.data.files;
 }
 
-main().catch(core.setFailed);
+async function writeExportedFiles({ exportFiles }) {
+  exportedFiles.forEach(async (exportedFile) => {
+    await fsPromises.writeFile(
+      `${outputDirectoryPath}/${exportedFile.id}.json`,
+      JSON.stringify(exportedFile)
+    );
+  });
+}
+
+main({
+  googleDriveFolderId: core.getInput("google_drive_folder_id"),
+  outputDirectoryPath: core.getInput("output_directory_path"),
+}).catch(core.setFailed);
