@@ -16,4 +16,4 @@ jobs:
           cache: npm
           node-version: 16
       - run: npm install
-      - run: npm run lint -- --check
+      - run: npm run lint
