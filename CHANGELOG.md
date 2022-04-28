@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.2.0 - 2022-04-29
+
 ### Changed
 
 - Strip out Google redirection URL in documents.
