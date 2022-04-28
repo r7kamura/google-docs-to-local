@@ -1,5 +1,6 @@
 const fsPromises = require("fs/promises");
 const { google } = require("googleapis");
+const { parse } = require("node-html-parser");
 const core = require("@actions/core");
 
 async function main({ googleDriveFolderId, outputDirectoryPath }) {
@@ -39,12 +40,14 @@ async function exportFile({ drive, fileId }) {
 async function exportFiles({ drive, files }) {
   return Promise.all(
     files.map(async (file) => {
+      const exportedHtml = await exportFile({
+        drive,
+        fileId: file.id,
+      });
+      const html = stripGoogleRedirectionUrl(exportedHtml);
       return {
         ...file,
-        html: await exportFile({
-          drive,
-          fileId: file.id,
-        }),
+        html,
       };
     })
   );
@@ -58,6 +61,24 @@ async function listFiles({ drive, googleDriveFolderId }) {
     q: `'${googleDriveFolderId}' in parents and mimeType = 'application/vnd.google-apps.document'`,
   });
   return response.data.files;
+}
+
+/**
+ * @param {string} html
+ * @returns {string}
+ */
+function stripGoogleRedirectionUrl(html) {
+  const root = parse(html);
+  root.querySelectorAll("a[href]").forEach((element) => {
+    const href = element.getAttribute("href");
+    if (!href) {
+      return;
+    }
+    const url = new URL(href);
+    const q = url.searchParams.get("q");
+    element.setAttribute("href", q);
+  });
+  return root.outerHTML;
 }
 
 async function writeExportedFiles({ exportedFiles, outputDirectoryPath }) {

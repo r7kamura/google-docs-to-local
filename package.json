@@ -6,7 +6,8 @@
   },
   "dependencies": {
     "@actions/core": "^1.7.0",
-    "googleapis": "^68.0.0"
+    "googleapis": "^68.0.0",
+    "node-html-parser": "^5.3.3"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.33.4",
