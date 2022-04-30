@@ -24,7 +24,7 @@ jobs:
         with:
           service_account: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
           workload_identity_provider: ${{ secrets.GOOGLE_WORKLOAD_IDENTITY_PROVIDER }}
-      - uses: r7kamura/google-docs-to-local@v0
+      - uses: r7kamura/google-docs-to-local@v2
         with:
           google_drive_folder_id: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
 ```
