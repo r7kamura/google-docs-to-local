@@ -84,7 +84,7 @@ function stripGoogleRedirectionUrl(html) {
 async function writeExportedFiles({ exportedFiles, outputDirectoryPath }) {
   exportedFiles.forEach(async (exportedFile) => {
     await fsPromises.writeFile(
-      `${outputDirectoryPath}/${exportedFile.name}.json`,
+      `${outputDirectoryPath}/${exportedFile.id}.json`,
       JSON.stringify(exportedFile, null, 2)
     );
   });
