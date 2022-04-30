@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0 - 2022-05-01
+
 ### Changed
 
 - Change output file format from `{id}.json` to `{name}.json`.
