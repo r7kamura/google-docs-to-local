@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.1 - 2023-05-30
+
 ### Fixed
 
 - Fix error that occurs when a document contains internal links.
