@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Fixed
+
+- Rebuild dist/index.js.
+
 ## 2.0.1 - 2023-05-30
 
 ### Fixed
